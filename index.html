@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kalkulator budżetu marketingowego i ROI – podziel roczny budżet między kanały i zobacz oczekiwany zysk.">
+  <title>Kalkulator budżetu i ROI</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#categories-title">Przejdź do tabeli kategorii</a>
+
+  <header class="app-header">
+    <div class="container">
+      <h1>Kalkulator budżetu marketingowego i&nbsp;ROI</h1>
+      <div class="budget-row">
+        <div class="field field-budget">
+          <label for="budget">Budżet roczny</label>
+          <input id="budget" type="text" inputmode="decimal" autocomplete="off"
+                 placeholder="np. 500 000" aria-describedby="budget-error budget-help">
+          <p id="budget-help" class="help">Kwota całego rocznego budżetu marketingowego.</p>
+          <p id="budget-error" class="field-error" role="alert" hidden></p>
+        </div>
+        <div class="field field-currency">
+          <label for="currency">Waluta</label>
+          <select id="currency" aria-describedby="currency-help">
+            <option value="PLN">PLN (zł)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="USD">USD ($)</option>
+          </select>
+          <p id="currency-help" class="help">Zmienia tylko symbol – kwoty nie są przeliczane.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="allocation" aria-labelledby="allocation-title">
+      <h2 id="allocation-title" class="visually-hidden">Przydział budżetu</h2>
+      <div id="allocation-status" class="allocation-status" data-state="under" aria-live="polite">
+        <span class="status-icon" aria-hidden="true"></span>
+        <span id="allocation-text"></span>
+      </div>
+      <div id="allocation-bar" class="allocation-bar" role="progressbar"
+           aria-labelledby="allocation-text" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="allocation-fill"></div>
+      </div>
+    </section>
+
+    <section class="card categories" aria-labelledby="categories-title">
+      <h2 id="categories-title" tabindex="-1">Kategorie</h2>
+      <p id="no-budget-hint" class="hint" hidden>Wpisz budżet, aby zobaczyć kwoty.</p>
+      <p class="hint roi-hint">
+        <strong>Oczekiwany ROI to zysk netto.</strong> ROI 150% przy wydatku 1&nbsp;000&nbsp;zł oznacza
+        1&nbsp;500&nbsp;zł zysku, czyli 2&nbsp;500&nbsp;zł całkowitego zwrotu.
+      </p>
+
+      <div class="table-wrap">
+        <table id="categories-table" class="categories-table">
+          <thead>
+            <tr>
+              <th scope="col">Kategoria</th>
+              <th scope="col" class="num">% budżetu</th>
+              <th scope="col" class="num">Kwota</th>
+              <th scope="col" class="num">Oczekiwany ROI</th>
+              <th scope="col" class="num">Zysk netto</th>
+              <th scope="col" class="num">Całkowity zwrot</th>
+              <th scope="col"><span class="visually-hidden">Akcje</span></th>
+            </tr>
+          </thead>
+          <tbody id="categories-body"></tbody>
+          <tfoot>
+            <tr>
+              <th scope="row">Razem</th>
+              <td class="num" data-label="% budżetu" id="total-percent"></td>
+              <td class="num" data-label="Kwota" id="total-amount"></td>
+              <td class="num" data-label="Łączny ROI" id="total-roi-cell"></td>
+              <td class="num" data-label="Zysk netto" id="total-profit-cell"></td>
+              <td class="num" data-label="Całkowity zwrot" id="total-return-cell"></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div id="empty-state" class="empty-state" hidden>
+        <p>Nie masz żadnych kategorii. Dodaj własną lub przywróć listę domyślną.</p>
+        <button type="button" id="restore-defaults" class="btn">Przywróć domyślne kategorie</button>
+      </div>
+
+      <div class="add-category">
+        <button type="button" id="add-toggle" class="btn btn-primary" aria-expanded="false" aria-controls="add-form">+ Dodaj kategorię</button>
+        <form id="add-form" class="add-form" hidden novalidate>
+          <div class="field">
+            <label for="new-name">Nazwa nowej kategorii</label>
+            <input id="new-name" type="text" maxlength="40" autocomplete="off" aria-describedby="new-name-error">
+            <p id="new-name-error" class="field-error" role="alert" hidden></p>
+          </div>
+          <div class="add-form-actions">
+            <button type="submit" class="btn btn-primary">Dodaj</button>
+            <button type="button" id="add-cancel" class="btn">Anuluj</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <div class="results-grid">
+      <section class="card results" aria-labelledby="results-title">
+        <h2 id="results-title">Wynik całego budżetu</h2>
+        <dl class="kpis">
+          <div class="kpi">
+            <dt>Zysk całkowity</dt>
+            <dd id="total-profit">–</dd>
+          </div>
+          <div class="kpi">
+            <dt>Całkowity zwrot</dt>
+            <dd id="total-return">–</dd>
+          </div>
+          <div class="kpi">
+            <dt>Łączny ROI</dt>
+            <dd id="total-roi">–</dd>
+          </div>
+        </dl>
+        <p class="hint">
+          Zysk całkowity to suma zysków netto kategorii. Całkowity zwrot = wydana kwota + zysk.
+          Łączny ROI to zysk podzielony przez kwotę przydzieloną do kategorii – nieprzydzielona część budżetu nie jest wliczana.
+        </p>
+      </section>
+
+      <section class="card chart" aria-labelledby="chart-title">
+        <h2 id="chart-title">Podział budżetu</h2>
+        <div class="chart-body">
+          <div class="donut-wrap">
+            <svg id="donut" class="donut" viewBox="0 0 200 200" role="img" aria-labelledby="chart-title chart-desc">
+              <desc id="chart-desc"></desc>
+              <g id="donut-segments" transform="rotate(-90 100 100)"></g>
+              <text x="100" y="96" text-anchor="middle" class="donut-value" id="donut-center"></text>
+              <text x="100" y="118" text-anchor="middle" class="donut-label">przydzielono</text>
+            </svg>
+            <div id="chart-tooltip" class="chart-tooltip" hidden></div>
+          </div>
+          <ul id="chart-legend" class="legend"></ul>
+        </div>
+        <p id="chart-note" class="hint" hidden></p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="app-footer container">
+    <button type="button" id="clear-plan" class="btn btn-danger">Wyczyść plan</button>
+    <p class="help">Dane zapisują się automatycznie tylko w tej przeglądarce i nie opuszczają Twojego urządzenia.
+      Wyczyszczenie danych przeglądarki usunie zapisany plan.</p>
+  </footer>
+
+  <dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <form method="dialog">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-message"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn" id="confirm-cancel">Anuluj</button>
+        <button value="ok" class="btn btn-danger" id="confirm-ok">Usuń</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="js/calc.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
